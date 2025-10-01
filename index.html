@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Minimal portfolio of Your Name: developer/designer.">
+    <title>Your Name — Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('theme');
+          if (stored) document.documentElement.setAttribute('data-theme', stored);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1 class="site-title">Your Name</h1>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">🌓</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="hero" class="hero container">
+        <h2>Building simple, thoughtful web experiences.</h2>
+        <p>I'm a role focused on clean design, accessibility, and performance.</p>
+      </section>
+
+      <section id="about" class="section container">
+        <h3>About</h3>
+        <p>
+          Brief bio goes here. Replace this with a few lines about who you are,
+          what you do, and what you care about.
+        </p>
+      </section>
+
+      <section id="projects" class="section container">
+        <h3>Projects</h3>
+        <div class="projects-grid">
+          <article class="card">
+            <h4>Project One</h4>
+            <p>One-sentence description of what it does and why it matters.</p>
+            <div class="meta">
+              <span class="tag">TypeScript</span>
+              <span class="tag">React</span>
+            </div>
+            <div class="actions">
+              <a class="button" href="#" target="_blank" rel="noopener">Live</a>
+              <a class="button ghost" href="#" target="_blank" rel="noopener">Code</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <h4>Project Two</h4>
+            <p>Another small project with a concise description.</p>
+            <div class="meta">
+              <span class="tag">Node</span>
+              <span class="tag">Express</span>
+            </div>
+            <div class="actions">
+              <a class="button" href="#" target="_blank" rel="noopener">Live</a>
+              <a class="button ghost" href="#" target="_blank" rel="noopener">Code</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="section container">
+        <h3>Contact</h3>
+        <p>Say hello at <a href="mailto:you@example.com">you@example.com</a>.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Your Name</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+      (function() {
+        var toggle = document.getElementById('theme-toggle');
+        if (!toggle) return;
+        toggle.addEventListener('click', function() {
+          var current = document.documentElement.getAttribute('data-theme');
+          var next = current === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          try { localStorage.setItem('theme', next); } catch (e) {}
+        });
+      })();
+    </script>
+  </body>
+  </html>
+
+

@@ -1,0 +1,19 @@
+{
+  "name": "benbye-portfolio",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.15",
+    "typescript": "5.9.2"
+  }
+}
