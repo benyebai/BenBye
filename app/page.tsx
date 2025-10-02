@@ -109,7 +109,7 @@ function FlickerText({ text, as: Tag = "h1" as const, className, speedMs = 120, 
 
 export default function HomePage() {
   const searchParams = useSearchParams();
-  const showListDefault = (searchParams?.get("list") === "1");
+  const showListDefault = !!searchParams?.has("home");
   const [showList, setShowList] = useState(showListDefault);
   const delayRef = useRef<number | null>(null);
 
@@ -119,7 +119,7 @@ export default function HomePage() {
 
   // keep showList in sync if user navigates with different query param
   useEffect(() => {
-    if (searchParams?.get("list") === "1") setShowList(true);
+    if (searchParams?.has("home")) setShowList(true);
   }, [searchParams]);
 
   return (
@@ -134,7 +134,7 @@ export default function HomePage() {
       ) : (
         <>
           <div className="brand-header" aria-hidden="false">
-            {searchParams?.get('list') === '1' ? (
+            {searchParams?.has('home') ? (
               <>
                 <div className="brand-top-left" onClick={() => window.location.href = '/'}><span className="brand-b">B</span><span className="brand-en">EN</span></div>
                 <div className="brand-vertical">AI</div>
@@ -150,7 +150,7 @@ export default function HomePage() {
               </>
             )}
           </div>
-          <PagedList fromBack={searchParams?.get('list') === '1'} />
+          <PagedList fromBack={searchParams?.has('home')} />
         </>
       )}
     </main>
@@ -420,24 +420,24 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
   const items = pages[pageIndex];
 
   return (
-    <div ref={containerRef} className={"stack" + (inView ? " inview" : "") }>
+    <div ref={containerRef} className={"stack" + (inView ? " inview" : "") + (fromBack ? " from-back" : "") }>
       <div className="list" ref={listRef}>
         {items.map((it, i) => (
           <div className="item" key={pageKey + "-item-" + i}>
             {it.href ? (
               it.href.startsWith('http') ? (
                 <a href={it.href} style={{ textDecoration: "none" }} onClick={(e) => { if (it.flickerNav === false) return; e.preventDefault(); navigateWithFlicker(it.href!); }} target="_blank" rel="noopener noreferrer">
-                  <FlickerText text={it.title} speedMs={fromBack ? 0 : (it.inSpeedTitle ?? 100)} triggerOut={triggerOut} outSpeedMs={35} />
+                  <FlickerText text={it.title} speedMs={it.inSpeedTitle ?? 100} triggerOut={triggerOut} outSpeedMs={35} />
                 </a>
               ) : (
                 <Link href={it.href} style={{ textDecoration: "none" }} onClick={(e) => { e.preventDefault(); navigateWithFlicker(it.href!); }}>
-                  <FlickerText text={it.title} speedMs={fromBack ? 0 : (it.inSpeedTitle ?? 100)} triggerOut={triggerOut} outSpeedMs={35} />
+                  <FlickerText text={it.title} speedMs={it.inSpeedTitle ?? 100} triggerOut={triggerOut} outSpeedMs={35} />
                 </Link>
               )
             ) : (
-              <FlickerText text={it.title} speedMs={fromBack ? 0 : (it.inSpeedTitle ?? 100)} triggerOut={triggerOut} outSpeedMs={35} />
+              <FlickerText text={it.title} speedMs={it.inSpeedTitle ?? 100} triggerOut={triggerOut} outSpeedMs={35} />
             )}
-            <FlickerText text={it.subtitle} as="div" className="subtitle" speedMs={fromBack ? 0 : (it.inSpeedSubtitle ?? 60)} triggerOut={triggerOut} outSpeedMs={subtitleOutSpeedFor(it.subtitle)} />
+            <FlickerText text={it.subtitle} as="div" className="subtitle" speedMs={it.inSpeedSubtitle ?? 60} triggerOut={triggerOut} outSpeedMs={subtitleOutSpeedFor(it.subtitle)} />
           </div>
         ))}
       </div>

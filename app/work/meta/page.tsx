@@ -79,16 +79,16 @@ export default function MetaPage() {
     const parts = [
       { text: "META", speed: 35 },
       { text: "Instagram Shop — Promotions", speed: 20 },
-      { text: "Built and lead a team of 5 senior engineers to build a promo code engine powering Instagram Shop's Third Party Sellers. \n\n", speed: 12 },
-      { text: "Desigend a high-performance deduplication system with constant-time lookups, enabling real time detection for validation and bulk upload", speed: 12 },
+      { text: "Lead a team of 5 senior engineers to refine promo code engine powering Instagram Shop's Third Party Sellers.", speed: 12 },
+      { text: "Designed a high-performance deduplication system with constant-time lookups, enabling real time detection for validation and bulk upload", speed: 12 },
       { text: "Revamped backend data model to scale unique code claiming, implementing seller-level isolation, async processing, and concurrency-safe logic to eliminate race conditions.", speed: 12 }
     ];
     const durations = parts.map(p => nonSpaceCount(p.text) * p.speed);
     const estimated = Math.max(...durations) + 60; // tighter buffer
     // prefetch destination for instant nav on click
-    router.prefetch("/?list=1");
+    router.prefetch("/?home");
     window.setTimeout(() => {
-      router.push("/?list=1");
+      router.push("/?home");
       const root2 = document.querySelector('.stack');
       root2?.classList.remove('animating');
     }, estimated);
@@ -102,15 +102,15 @@ export default function MetaPage() {
       <div className="stack" style={{ gap: 16 }}>
         <div className="intro" style={{ gap: 6 }}>
           <FlickerText text="META" triggerOut={out} />
-          <FlickerText text="Instagram Shop — Promotions" as="div" className="intro-subtitle" speedMs={50} triggerOut={out} outSpeedMs={20} />
+          <FlickerText text="Instagram Shop — Promotions" as="div" className="intro-subtitle" speedMs={80} triggerOut={out} outSpeedMs={10} />
         </div>
         <div className="container" style={{ maxWidth: 720, textAlign: "left", paddingTop: 8 }}>
-          <FlickerText text={"Lead a team of 5 senior engineers to refine promo code engine powering Instagram Shop's Third Party Sellers. \n"} as="div" className="subtitle" speedMs={5} triggerOut={out} outSpeedMs={5} />
-          <FlickerText text={"Designed a high-performance deduplication system with constant-time lookups, enabling real time detection for validation and bulk upload \n"} as="div" className="subtitle" speedMs={5} triggerOut={out} outSpeedMs={5} />
-          <FlickerText text={"Revamped backend data model to scale unique code claiming, implementing seller-level isolation, async processing, and concurrency-safe logic to eliminate race conditions."} as="div" className="subtitle" speedMs={5} triggerOut={out} outSpeedMs={5} />
+          <FlickerText text={"Lead a team of 5 senior engineers to refine promo code engine powering Instagram Shop's Third Party Sellers."} as="div" className="subtitle" speedMs={10} triggerOut={out} outSpeedMs={5} />
+          <FlickerText text={"Designed a high-performance deduplication system with constant-time lookups, enabling real time detection for validation and bulk upload"} as="div" className="subtitle" speedMs={10} triggerOut={out} outSpeedMs={5} />
+          <FlickerText text={"Revamped backend data model to scale unique code claiming, implementing seller-level isolation, async processing, and concurrency-safe logic to eliminate race conditions."} as="div" className="subtitle" speedMs={10} triggerOut={out} outSpeedMs={5} />
         </div>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", paddingTop: 12 }}>
-          <Link href="/?list=1" style={{ textDecoration: "none" }} onClick={handleBack}>
+          <Link href="/?home" style={{ textDecoration: "none" }} onClick={handleBack}>
             <FlickerText text="Back" as="span" className="subtitle back-underline" speedMs={60} triggerOut={out} outSpeedMs={20} />
           </Link>
         </div>

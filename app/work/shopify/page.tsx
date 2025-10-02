@@ -95,8 +95,8 @@ export default function ShopifyPage() {
     ];
     const durations = parts.map(p => nonSpaceCount(p.text) * p.speed);
     const estimated = Math.max(...durations) + 60;
-    router.prefetch("/?list=1");
-    window.setTimeout(() => { router.push("/?list=1"); document.querySelector('.stack')?.classList.remove('animating'); }, estimated);
+    router.prefetch("/?home");
+    window.setTimeout(() => { router.push("/?home"); document.querySelector('.stack')?.classList.remove('animating'); }, estimated);
   }
 
   return (
