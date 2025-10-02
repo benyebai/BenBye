@@ -115,7 +115,7 @@ export default function ShopifyPage() {
           <FlickerText text={"Also improved AI generation across shopify, decreasing token usage and adding layers of content moderation"} as="div" className="subtitle" speedMs={10} triggerOut={out} outSpeedMs={12} />
         </div>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", paddingTop: 12 }}>
-          <Link href="/?list=1" style={{ textDecoration: "none" }} onClick={handleBack}>
+          <Link href="/?home" style={{ textDecoration: "none" }} onClick={handleBack}>
             <FlickerText text="Back" as="span" className="subtitle back-underline" speedMs={60} triggerOut={out} outSpeedMs={20} />
           </Link>
         </div>

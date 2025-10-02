@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef, Suspense } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function FlickerText({ text, as: Tag = "h1" as const, className, speedMs = 120, triggerOut = false, outSpeedMs = 110 }: { text: string; as?: any; className?: string; speedMs?: number; triggerOut?: boolean; outSpeedMs?: number }) {
   const letters = useMemo(() => text.split("").map((ch) => ch), [text]);
@@ -33,7 +32,6 @@ function FlickerText({ text, as: Tag = "h1" as const, className, speedMs = 120, 
     return () => clearInterval(interval);
   }, [letters, speedMs]);
 
-  // Flicker-out when triggered
   useEffect(() => {
     if (!triggerOut) return;
     const interval = setInterval(() => {
@@ -107,70 +105,6 @@ function FlickerText({ text, as: Tag = "h1" as const, className, speedMs = 120, 
   );
 }
 
-function HomePage() {
-  const searchParams = useSearchParams();
-  const showListDefault = !!searchParams?.has("home");
-  const [showList, setShowList] = useState(showListDefault);
-  const delayRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => { if (delayRef.current) clearTimeout(delayRef.current); };
-  }, []);
-
-  // keep showList in sync if user navigates with different query param
-  useEffect(() => {
-    if (searchParams?.has("home")) setShowList(true);
-  }, [searchParams]);
-
-  return (
-    <main className="screen-center">
-      {!showList ? (
-        <NameIntro
-          onDone={() => {
-            if (delayRef.current) clearTimeout(delayRef.current);
-            delayRef.current = window.setTimeout(() => setShowList(true), 600);
-          }}
-        />
-      ) : (
-        <>
-          <div className="brand-header" aria-hidden="false" style={{display: 'block'}}>
-            {searchParams?.has('home') ? (
-              <>
-                <div className="brand-top-left" onClick={() => window.location.href = '/'}><span className="brand-b">B</span><span className="brand-en">EN</span></div>
-                <div className="brand-vertical">AI</div>
-              </>
-            ) : (
-              <>
-                <div className="brand-top-left" onClick={() => window.location.href = '/'}>
-                  <FlickerText text="BEN" as="span" className="brand-ben" speedMs={70} />
-                </div>
-                <div className="brand-vertical">
-                  <FlickerText text="AI" as="span" className="brand-ai" speedMs={70} />
-                </div>
-              </>
-            )}
-          </div>
-          <PagedList fromBack={searchParams?.has('home')} />
-          <nav className="footer-links" aria-label="Social links">
-            <a href="https://x.com/benbye" target="_blank" rel="noopener noreferrer">X</a>
-            <a href="https://www.linkedin.com/in/benjamin-bai-709090210/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            <a href="mailto:benjamin.bai@uwaterloo.ca">Email</a>
-            <a href="https://github.com/benyebai" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </nav>
-        </>
-      )}
-    </main>
-  );
-}
-
-export default function Page() {
-  return (
-    <Suspense fallback={null}>
-      <HomePage />
-    </Suspense>
-  );
-}
-
 function NameIntro({ onDone }: { onDone: () => void }) {
   const NAME = "BENJAMIN BAI";
   const letters = useMemo(() => NAME.split("").map((ch) => ch), []);
@@ -191,7 +125,6 @@ function NameIntro({ onDone }: { onDone: () => void }) {
             .map((v, i) => (!v && letters[i] !== " " ? i : -1))
             .filter((i) => i !== -1);
           if (candidates.length === 0) {
-            // enter a brief pause before flickering out
             stage.current = "pause";
             if (pauseTimer.current) {
               clearTimeout(pauseTimer.current);
@@ -208,7 +141,6 @@ function NameIntro({ onDone }: { onDone: () => void }) {
           return next;
         });
       } else if (stage.current === "pause") {
-        // do nothing during pause
         return;
       } else if (stage.current === "out") {
         setRevealed((prev) => {
@@ -222,7 +154,6 @@ function NameIntro({ onDone }: { onDone: () => void }) {
             return prev;
           }
           const idx = candidates[Math.floor(Math.random() * candidates.length)];
-          // trigger flicker-out effect
           setOutFx((prevFx) => {
             const fx = prevFx.slice();
             fx[idx] = true;
@@ -248,7 +179,6 @@ function NameIntro({ onDone }: { onDone: () => void }) {
     };
   }, [letters, onDone]);
 
-  // Notify parent after render to avoid setState during render warning
   useEffect(() => {
     if (completed && !doneRef.current) {
       doneRef.current = true;
@@ -291,7 +221,7 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
   const [pageIndex, setPageIndex] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
   const [triggerOut, setTriggerOut] = useState(false);
-  const [pageKey, setPageKey] = useState(0); // force remount of FlickerText on page change
+  const [pageKey, setPageKey] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const wheelLockRef = useRef<number>(0);
@@ -305,8 +235,7 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
 
   function subtitleOutSpeedFor(text: string): number {
     const len = nonSpaceCount(text) || 1;
-    // Longer text -> smaller ms per letter (faster). Clamp to reasonable range.
-    const ms = Math.round(800 / len); // heuristic
+    const ms = Math.round(800 / len);
     return Math.min(35, Math.max(10, ms));
   }
 
@@ -314,18 +243,17 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
     if (transitioning || next === pageIndex || next < 0 || next >= pages.length) return;
     setTransitioning(true);
     setTriggerOut(true);
-    // mark animating to suppress underline animations during flicker
     const root = containerRef.current;
     if (root) root.classList.add("animating");
     const currentItems = pages[pageIndex];
-    const titleOutSpeed = 35; // ms/letter
+    const titleOutSpeed = 35;
     const perItemDur = currentItems.map((it) => {
       const titleDur = nonSpaceCount(it.title) * titleOutSpeed;
       const subSpeed = subtitleOutSpeedFor(it.subtitle);
       const subDur = nonSpaceCount(it.subtitle) * subSpeed;
       return Math.max(titleDur, subDur);
     });
-    const estimated = Math.max(...perItemDur) + 140; // small buffer for animation tail
+    const estimated = Math.max(...perItemDur) + 140;
     window.setTimeout(() => {
       setPageIndex(next);
       setPageKey((k) => k + 1);
@@ -361,7 +289,6 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
     }, estimated);
   }
 
-  // keyboard
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (transitioning) return;
@@ -372,7 +299,6 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [transitioning, pageIndex]);
 
-  // wheel
   useEffect(() => {
     function onWheel(e: WheelEvent) {
       if (transitioning) return;
@@ -386,7 +312,6 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
     return () => window.removeEventListener("wheel", onWheel as any);
   }, [transitioning, pageIndex]);
 
-  // touch swipe
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -415,14 +340,12 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
     };
   }, [transitioning, pageIndex]);
 
-  // track list full visibility; enable underline animation only when fully in view
   useEffect(() => {
     const el = listRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        // Consider fully in view when intersection ratio is ~1
         setInView(entry.isIntersecting && entry.intersectionRatio >= 0.99);
       },
       { threshold: [0, 0.5, 0.99, 1] }
@@ -434,7 +357,7 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
   const items = pages[pageIndex];
 
   return (
-    <div ref={containerRef} className={"stack" + (inView ? " inview" : "") + (fromBack ? " from-back" : "") }>
+    <div ref={containerRef} className={"stack" + (inView ? " inview" : "") }>
       <div className="list" ref={listRef}>
         {items.map((it, i) => (
           <div className="item" key={pageKey + "-item-" + i}>
@@ -466,23 +389,35 @@ function PagedList({ fromBack = false }: { fromBack?: boolean }) {
           />
         ))}
       </nav>
-      <nav className="footer-links" aria-label="Social links">
-        <a href="https://x.com/benbye" target="_blank" rel="noopener noreferrer">
-          <FlickerText text="X" as="span" className="footer-fx" speedMs={fromBack ? 0 : 70} />
-        </a>
-        <a href="https://www.linkedin.com/in/benjamin-bai-709090210/" target="_blank" rel="noopener noreferrer">
-          <FlickerText text="LinkedIn" as="span" className="footer-fx" speedMs={fromBack ? 0 : 70} />
-        </a>
-        <a href="mailto:benjamin.bai@uwaterloo.ca">
-          <FlickerText text="Email" as="span" className="footer-fx" speedMs={fromBack ? 0 : 70} />
-        </a>
-        <a href="https://github.com/benyebai" target="_blank" rel="noopener noreferrer">
-          <FlickerText text="GitHub" as="span" className="footer-fx" speedMs={fromBack ? 0 : 70} />
-        </a>
-      </nav>
     </div>
   );
 }
 
+export default function HomePageClient() {
+  const searchParams = useSearchParams();
+  const [showList, setShowList] = useState<boolean>(!!searchParams?.has("home"));
+  const delayRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => { if (delayRef.current) clearTimeout(delayRef.current); };
+  }, []);
+
+  useEffect(() => {
+    if (searchParams?.has("home")) setShowList(true);
+  }, [searchParams]);
+
+  return (
+    <main className="screen-center">
+      {!showList ? (
+        <NameIntro onDone={() => {
+          if (delayRef.current) clearTimeout(delayRef.current);
+          delayRef.current = window.setTimeout(() => setShowList(true), 600);
+        }} />
+      ) : (
+        <PagedList />
+      )}
+    </main>
+  );
+}
 
 
