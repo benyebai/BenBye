@@ -181,10 +181,25 @@ function NameIntro({ onDone }: { onDone: () => void }) {
   const pauseTimer = useRef<number | null>(null);
   const [completed, setCompleted] = useState(false);
   const [subFade, setSubFade] = useState(false);
+  const startedRef = useRef(false);
+  const [started, setStarted] = useState(false);
+
+  // Ensure animation starts only after first paint to avoid pre-revealed letters on slow loads
+  useEffect(() => {
+    let raf1 = 0, raf2 = 0;
+    raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        startedRef.current = true;
+        setStarted(true);
+      });
+    });
+    return () => { if (raf1) cancelAnimationFrame(raf1); if (raf2) cancelAnimationFrame(raf2); };
+  }, []);
 
   useEffect(() => {
     const tickMs = 110;
     const interval = setInterval(() => {
+      if (!startedRef.current) return; // wait until initial paint before progressing
       if (stage.current === "in") {
         setRevealed((prev) => {
           const candidates = prev
@@ -258,7 +273,9 @@ function NameIntro({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="intro">
-      <FlickerText text="Software engineer" as="div" className={"intro-subtitle"} speedMs={90} triggerOut={subFade} outSpeedMs={110} />
+      {started ? (
+        <FlickerText text="Software engineer" as="div" className={"intro-subtitle"} speedMs={90} triggerOut={subFade} outSpeedMs={110} />
+      ) : null}
       <h1 className="name" aria-label={NAME}>
         {letters.map((ch, i) => (
           <span key={i} className={"letter" + (revealed[i] ? " on" : "") + (outFx[i] ? " off" : "")}>
@@ -266,7 +283,9 @@ function NameIntro({ onDone }: { onDone: () => void }) {
           </span>
         ))}
       </h1>
-      <FlickerText text="cs [at] uwaterloo" as="div" className={"intro-subtitle"} speedMs={90} triggerOut={subFade} outSpeedMs={110} />
+      {started ? (
+        <FlickerText text="cs [at] uwaterloo" as="div" className={"intro-subtitle"} speedMs={90} triggerOut={subFade} outSpeedMs={110} />
+      ) : null}
     </div>
   );
 }
